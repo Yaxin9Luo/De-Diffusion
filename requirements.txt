@@ -16,3 +16,5 @@ click
 torch_tb_profiler
 wandb
 accelerate
+transformers
+open_clip_torch
