@@ -1,34 +1,61 @@
 import torch
 import torch.nn as nn
-from transformers import ViTModel,BertModel, BertConfig
+from transformers import ViTModel,BertModel, BertConfig, CLIPModel, CLIPTokenizer
+class MyModel(nn.Module):
+    def __init__(self, clip_model_name='openai/clip-vit-base-patch16'):
+        super(MyModel, self).__init__()
 
-class ImageBackbone(torch.nn.Module):
-    """ Image Backbone class.
-
-    Args:
-        None   
-    Returns:
-        Output tensor with shape [N,out_features]
-    Usage:
-        >>> model = ImageBackbone()
-        >>> output = model(x)
-    """
-    def __init__(self):
-        super(ImageBackbone, self).__init__()
         # Load the pre-trained ViT model
-        self.model = ViTModel.from_pretrained('google/vit-large-patch16-224')
-    
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass of the model.
+        self.vit = ViTModel.from_pretrained('google/vit-large-patch16-224')
+        # Initialize the attention pooler
+        self.attention_pooler = AttentionPooler()
         
-        Args:
-            x: input tensor expected to be of shape [N,in_features]
+        # Load CLIP model for tokenizing text
+        self.clip_model = CLIPModel.from_pretrained(clip_model_name)
+        self.clip_tokenizer = CLIPTokenizer.from_pretrained(clip_model_name)
 
-        Returns:
-            Output tensor with shape [N,out_features]
+        # Linear layer for projecting queries to text tokens
+        self.linear_proj = nn.Linear(self.vit.config.hidden_size, self.clip_tokenizer.vocab_size)
+        # Define special token IDs (assuming CLIP tokenizer's convention)
+        self.sos_token_id = self.clip_tokenizer.cls_token_id  # Start of Sequence Token
+        self.eos_token_id = self.clip_tokenizer.sep_token_id  # End of Sequence Token
+        # Assuming the maximum sequence length (including [SOS] and [EOS]) is 77
+        self.max_length = 77
 
-        """
-        return self.model(x)
+    def forward(self, images):
+        # Pass images through ViT
+        vit_outputs = self.vit(images,return_tensors="pt")
+
+        # Apply attention pooling
+        pooled_outputs = self.attention_pooler(vit_outputs.last_hidden_state)
+
+        # Project to text tokens
+        text_tokens = self.linear_proj(pooled_outputs)
+
+        # Additional logic to handle [SOS], [EOS], and positional encodings
+        # Add [SOS] token at the beginning and [EOS] at the end
+        batch_size = text_tokens.size(0)
+        sos_tokens = torch.full((batch_size, 1), self.sos_token_id, device=text_tokens.device)
+        eos_tokens = torch.full((batch_size, 1), self.eos_token_id, device=text_tokens.device)
+
+        # Combine [SOS], text tokens, and [EOS]
+        text_tokens = torch.cat([sos_tokens, text_tokens, eos_tokens], dim=1)
+
+        # Apply positional encoding (up to the maximum length)
+        position_ids = torch.arange(self.max_length, device=text_tokens.device).expand((batch_size, -1))
+        
+        # Trim or pad text tokens to maintain the max_length
+        if text_tokens.size(1) > self.max_length:
+            text_tokens = text_tokens[:, :self.max_length]
+        else:
+            padding_length = self.max_length - text_tokens.size(1)
+            text_tokens = torch.nn.functional.pad(text_tokens, (0, padding_length), value=self.clip_tokenizer.pad_token_id)
+
+        # Decode text tokens to text
+        decoded_texts = [self.clip_tokenizer.decode(tokens, skip_special_tokens=True) 
+                        for tokens in text_tokens]
+
+        return decoded_texts
 
 class AttentionPooler(nn.Module):
     """ Attention Pooler class.
