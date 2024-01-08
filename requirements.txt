@@ -18,3 +18,5 @@ wandb
 accelerate
 transformers
 open_clip_torch
+datasets
+diffusers

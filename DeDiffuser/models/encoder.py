@@ -1,12 +1,15 @@
 import torch
 import torch.nn as nn
-from transformers import ViTModel,BertModel, BertConfig, CLIPModel, CLIPTokenizer
+from transformers import ViTImageProcessor, ViTModel,CLIPModel,CLIPTokenizer,BertModel,BertConfig
+
 class MyModel(nn.Module):
     def __init__(self, clip_model_name='openai/clip-vit-base-patch16'):
         super(MyModel, self).__init__()
 
         # Load the pre-trained ViT model
-        self.vit = ViTModel.from_pretrained('google/vit-large-patch16-224')
+        self.processor = ViTImageProcessor.from_pretrained('google/vit-large-patch16-224-in21k')
+
+        self.vit = ViTModel.from_pretrained('google/vit-large-patch16-224-in21k')
         # Initialize the attention pooler
         self.attention_pooler = AttentionPooler()
         
@@ -15,46 +18,36 @@ class MyModel(nn.Module):
         self.clip_tokenizer = CLIPTokenizer.from_pretrained(clip_model_name)
 
         # Linear layer for projecting queries to text tokens
-        self.linear_proj = nn.Linear(self.vit.config.hidden_size, self.clip_tokenizer.vocab_size)
+        self.linear_proj = nn.Linear(768, self.clip_tokenizer.vocab_size)
         # Define special token IDs (assuming CLIP tokenizer's convention)
-        self.sos_token_id = self.clip_tokenizer.cls_token_id  # Start of Sequence Token
-        self.eos_token_id = self.clip_tokenizer.sep_token_id  # End of Sequence Token
+        self.sos_token_id = self.clip_tokenizer.bos_token_id  # Start of Sequence Token ID
+        self.eos_token_id = self.clip_tokenizer.eos_token_id  # End of Sequence Token
         # Assuming the maximum sequence length (including [SOS] and [EOS]) is 77
         self.max_length = 77
 
     def forward(self, images):
         # Pass images through ViT
-        vit_outputs = self.vit(images,return_tensors="pt")
-
+        vit_inputs = self.processor(images=images, return_tensors="pt")
+        vit_outputs = self.vit(**vit_inputs)
         # Apply attention pooling
         pooled_outputs = self.attention_pooler(vit_outputs.last_hidden_state)
 
         # Project to text tokens
-        text_tokens = self.linear_proj(pooled_outputs)
-
+        text_tokens = self.linear_proj(pooled_outputs) # [75,1,49408]
+        probabilities = torch.softmax(text_tokens, dim=-1)
+        # Decode text tokens to text
+        predicted_token_ids = torch.argmax(probabilities, dim=-1)
         # Additional logic to handle [SOS], [EOS], and positional encodings
         # Add [SOS] token at the beginning and [EOS] at the end
         batch_size = text_tokens.size(0)
-        sos_tokens = torch.full((batch_size, 1), self.sos_token_id, device=text_tokens.device)
-        eos_tokens = torch.full((batch_size, 1), self.eos_token_id, device=text_tokens.device)
+        sos_tokens = torch.full((batch_size, 1), self.sos_token_id, device=text_tokens.device) # [75,1]
+        eos_tokens = torch.full((batch_size, 1), self.eos_token_id, device=text_tokens.device) # [75,1]
 
         # Combine [SOS], text tokens, and [EOS]
-        text_tokens = torch.cat([sos_tokens, text_tokens, eos_tokens], dim=1)
-
-        # Apply positional encoding (up to the maximum length)
-        position_ids = torch.arange(self.max_length, device=text_tokens.device).expand((batch_size, -1))
-        
-        # Trim or pad text tokens to maintain the max_length
-        if text_tokens.size(1) > self.max_length:
-            text_tokens = text_tokens[:, :self.max_length]
-        else:
-            padding_length = self.max_length - text_tokens.size(1)
-            text_tokens = torch.nn.functional.pad(text_tokens, (0, padding_length), value=self.clip_tokenizer.pad_token_id)
-
+        text_tokens = torch.cat([sos_tokens, predicted_token_ids, eos_tokens], dim=1)
         # Decode text tokens to text
         decoded_texts = [self.clip_tokenizer.decode(tokens, skip_special_tokens=True) 
                         for tokens in text_tokens]
-
         return decoded_texts
 
 class AttentionPooler(nn.Module):
