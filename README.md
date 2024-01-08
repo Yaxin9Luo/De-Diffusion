@@ -22,7 +22,7 @@ The directory structure of the project looks like this:
 │   │
 │   └── source/          <- Source directory for documentation files
 │
-├── models               <- Trained and serialized models, model predictions, or model summaries
+├── logs               <- Trained and serialized models, model predictions, or model summaries
 │
 ├── notebooks            <- Jupyter notebooks.
 │
@@ -41,7 +41,7 @@ The directory structure of the project looks like this:
 │   │
 │   ├── __init__.py      <- Makes folder a Python module
 │   │
-│   ├── data             <- Scripts to download or generate data
+│   ├── dataloader             <- Scripts to download or generate data
 │   │   ├── __init__.py
 │   │   └── make_dataset.py
 │   │
