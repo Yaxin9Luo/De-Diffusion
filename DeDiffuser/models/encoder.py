@@ -1,11 +1,12 @@
 import torch
 import torch.nn as nn
 from transformers import ViTImageProcessor, ViTModel,CLIPModel,CLIPTokenizer,BertModel,BertConfig
+import torch.nn.functional as F
 
 class MyModel(nn.Module):
-    def __init__(self, clip_model_name='openai/clip-vit-base-patch16'):
+    def __init__(self, clip_model_name='openai/clip-vit-base-patch16', tau_initial=1.0):
         super(MyModel, self).__init__()
-
+        self.tau = tau_initial
         # Load the pre-trained ViT model
         self.processor = ViTImageProcessor.from_pretrained('google/vit-large-patch16-224-in21k')
 
@@ -27,14 +28,16 @@ class MyModel(nn.Module):
 
     def forward(self, images):
         # Pass images through ViT
+        device = "cuda"
         vit_inputs = self.processor(images=images, return_tensors="pt")
+        vit_inputs = {k: v.to(device) for k, v in vit_inputs.items()}  # Ensure all inputs are on GPU
         vit_outputs = self.vit(**vit_inputs)
         # Apply attention pooling
         pooled_outputs = self.attention_pooler(vit_outputs.last_hidden_state)
 
         # Project to text tokens
         text_tokens = self.linear_proj(pooled_outputs) # [75,1,49408]
-        probabilities = torch.softmax(text_tokens, dim=-1)
+        probabilities = F.gumbel_softmax(text_tokens, tau=self.tau, hard=True, dim=-1)
         # Decode text tokens to text
         predicted_token_ids = torch.argmax(probabilities, dim=-1)
         # Additional logic to handle [SOS], [EOS], and positional encodings

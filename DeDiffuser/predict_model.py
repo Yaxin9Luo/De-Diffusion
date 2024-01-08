@@ -1,24 +1,12 @@
 import torch
 from PIL import Image
-from torchvision.transforms import Compose, Resize, ToTensor, Normalize
+from torchvision.transforms import Compose, Resize, ToTensor, Normalize,transforms
 from models.encoder import MyModel
 from transformers import ViTFeatureExtractor
 from datasets import load_dataset
 import requests
 from diffusers import StableDiffusionPipeline
-
-
-# Define a function to preprocess the images
-def preprocess_images(images):
-    feature_extractor = ViTFeatureExtractor.from_pretrained('google/vit-large-patch16-224-in21k')
-    return feature_extractor(images=images, return_tensors="pt")
-
-# Define a function to load and preprocess the dataset
-def get_preprocessed_dataset(dataset_name, split='test'):
-    dataset = load_dataset(dataset_name, split=split)
-    # Assuming the dataset has an "image" column
-    images = [Image.open(image_path).convert("RGB") for image_path in dataset['image']]
-    return preprocess_images(images)
+from transformers import BlipProcessor, BlipForConditionalGeneration
 
 # Define the prediction function
 def predict(text_model, image):
@@ -44,14 +32,21 @@ def generate_image(text):
 def main():
     # Load the dataset
     url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
-    image = Image.open(requests.get(url, stream=True).raw) # 640x480
-    # Load the model
-    text_model = MyModel()
+    image = Image.open(requests.get(url, stream=True).raw).convert('RGB') # 640x480
+    processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-large")
+    model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-large").to("cuda")
+    ## Load the model
+    # text_model = MyModel().to("cuda")
     # Predict
-    predictions = tokens_to_sentence(predict(text_model, image))
-    generate_image(predictions)
+    prompt_text = "a photography of"
+    inputs = processor(image,prompt_text, return_tensors="pt").to("cuda")
+    max_length = 75
+    out = model.generate(**inputs,max_length=max_length, min_length=40, num_beams=5)
+    text = processor.decode(out[0], skip_special_tokens=True)
+    print(processor.decode(out[0], skip_special_tokens=True))
+    # predictions = tokens_to_sentence(predict(text_model, image))
+    generate_image(text)
     # Print predictions
-    print(predictions)
 
 if __name__ == "__main__":
     main()
