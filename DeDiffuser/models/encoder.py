@@ -4,19 +4,19 @@ from transformers import ViTImageProcessor, ViTModel,CLIPModel,CLIPTokenizer,Ber
 import torch.nn.functional as F
 
 class MyModel(nn.Module):
-    def __init__(self, clip_model_name='openai/clip-vit-base-patch16', tau_initial=1.0):
+    def __init__(self, cfg):
         super(MyModel, self).__init__()
-        self.tau = tau_initial
+        self.tau = cfg['tau_initial']
         # Load the pre-trained ViT model
-        self.processor = ViTImageProcessor.from_pretrained('google/vit-large-patch16-224-in21k')
+        self.processor = ViTImageProcessor.from_pretrained(cfg['vit'])
 
-        self.vit = ViTModel.from_pretrained('google/vit-large-patch16-224-in21k')
+        self.vit = ViTModel.from_pretrained(cfg['vit'])
         # Initialize the attention pooler
         self.attention_pooler = AttentionPooler()
         
         # Load CLIP model for tokenizing text
-        self.clip_model = CLIPModel.from_pretrained(clip_model_name)
-        self.clip_tokenizer = CLIPTokenizer.from_pretrained(clip_model_name)
+        self.clip_model = CLIPModel.from_pretrained(cfg['clip_model_name'])
+        self.clip_tokenizer = CLIPTokenizer.from_pretrained(cfg['clip_model_name'])
 
         # Linear layer for projecting queries to text tokens
         self.linear_proj = nn.Linear(768, self.clip_tokenizer.vocab_size)
@@ -24,11 +24,13 @@ class MyModel(nn.Module):
         self.sos_token_id = self.clip_tokenizer.bos_token_id  # Start of Sequence Token ID
         self.eos_token_id = self.clip_tokenizer.eos_token_id  # End of Sequence Token
         # Assuming the maximum sequence length (including [SOS] and [EOS]) is 77
-        self.max_length = 77
+        self.max_length = cfg['max_length']
+        self.hard = cfg['hard']
+        self.dim = cfg['dim']   
 
     def forward(self, images):
         # Pass images through ViT
-        device = "cuda"
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         vit_inputs = self.processor(images=images, return_tensors="pt")
         vit_inputs = {k: v.to(device) for k, v in vit_inputs.items()}  # Ensure all inputs are on GPU
         vit_outputs = self.vit(**vit_inputs)
@@ -37,9 +39,9 @@ class MyModel(nn.Module):
 
         # Project to text tokens
         text_tokens = self.linear_proj(pooled_outputs) # [75,1,49408]
-        probabilities = F.gumbel_softmax(text_tokens, tau=self.tau, hard=True, dim=-1)
+        probabilities = F.gumbel_softmax(text_tokens, tau=self.tau, hard=self.hard, dim=self.dim)
         # Decode text tokens to text
-        predicted_token_ids = torch.argmax(probabilities, dim=-1)
+        predicted_token_ids = torch.argmax(probabilities, dim= self.dim)
         # Additional logic to handle [SOS], [EOS], and positional encodings
         # Add [SOS] token at the beginning and [EOS] at the end
         batch_size = text_tokens.size(0)
@@ -52,6 +54,8 @@ class MyModel(nn.Module):
         decoded_texts = [self.clip_tokenizer.decode(tokens, skip_special_tokens=True) 
                         for tokens in text_tokens]
         return decoded_texts
+
+
 
 class AttentionPooler(nn.Module):
     """ Attention Pooler class.

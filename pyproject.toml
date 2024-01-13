@@ -3,7 +3,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "diffuser"
+name = "DeDiffuser"
 version = "0.0.1"
 description = "This is the exam project for DTU\u0027s Project Course Machine Learning Operations, we are team 18"
 authors = [
@@ -15,7 +15,7 @@ requires-python = ">=3.11"
 dynamic = ["dependencies", "optional-dependencies"]
 
 [tool.setuptools]
-packages = ["diffuser"]
+packages = ["DeDiffuser"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}

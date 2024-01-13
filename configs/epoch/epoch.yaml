@@ -1,0 +1,7 @@
+learning_rate: 0.0001
+batch_size: 6
+num_epochs: 10
+pre_trained_diffusion_model: "CompVis/stable-diffusion-v1-4"
+resize_dataloader: 224
+image_url: 'http://images.cocodataset.org/val2017/000000039769.jpg'
+generate_image_model: "CompVis/stable-diffusion-v1-4"
