@@ -1,0 +1,15 @@
+model:
+  tau_initial: 1.0
+  max_length: 77
+  hard: true
+  dim: -1
+  clip_model_name: openai/clip-vit-base-patch16
+  vit: google/vit-large-patch16-224-in21k
+epoch:
+  learning_rate: 0.0001
+  batch_size: 6
+  num_epochs: 10
+  pre_trained_diffusion_model: CompVis/stable-diffusion-v1-4
+  resize_dataloader: 224
+  image_url: http://images.cocodataset.org/val2017/000000039769.jpg
+  generate_image_model: CompVis/stable-diffusion-v1-4
