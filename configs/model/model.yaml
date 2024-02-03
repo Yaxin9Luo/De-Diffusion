@@ -1,6 +1,0 @@
-tau_initial: 1.0
-max_length : 77
-hard: True
-dim: -1
-clip_model_name: 'openai/clip-vit-base-patch16'
-vit: 'google/vit-large-patch16-224-in21k'

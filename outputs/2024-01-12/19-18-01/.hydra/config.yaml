@@ -1,8 +1,0 @@
-model:
-  tau_initial: 1.0
-  max_length: 77
-  hard: true
-  dim: -1
-  clip_model_name: openai/clip-vit-base-patch16
-  vit: pregoogle/vit-large-patch16-224-in21k
-epoch: {}
