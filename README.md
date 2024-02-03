@@ -17,8 +17,7 @@ The directory structure of the project looks like this:
 │
 │
 ├── requirements.txt     <- The requirements file for reproducing the analysis environment
-|
-││
+│
 ├── DeDiffusion  <- Source code for use in this project.
 │   │
 │   ├── dataloader             <- Scripts to download or generate data
