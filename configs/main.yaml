@@ -1,70 +1,31 @@
-MODEL:
-  MODEL: 'RefCLIP'
-  USE_GLOVE: True
-  WORD_EMBED_SIZE: 300
-  EMBED_FREEZE: True
-  HIDDEN_SIZE: 512
-  DROPOUT_R: 0.1
-  MULTI_HEAD: 8
-  FF_SIZE: 2048
-  FLAT_GLIMPSES: 1
-  LANG_ENC: 'lstm'
-  N_SA: 3
-  VIS_ENC: 'yolov3'
-  VIS_FREEZE: True
-  SELECT_NUM: 17
-  CLASS_NUM: 80
+# Configurations for MyModel (encoder.py)
+model:
+  tau_initial: 0.5 # Initial value for tau
+  vit: "google/vit-base-patch16-224" # Pre-trained ViT model
+  clip_model_name: "openai/clip-vit-base-patch32" # Pre-trained CLIP model
+  max_length: 77 # Maximum sequence length for token generation
+  hard: False # Use hard sampling in gumbel softmax
+  dim: -1 # Dimension for operations in MyModel
 
-TRAIN:
-  GPU: [3]
-  BATCH_SIZE: 64 # total batch size on a single node if multiprocessing_distributed else batch size on one gpu
-  NUM_WORKER: 8 # same as BATCH_SIZE
-  LR: 0.0001
-  EPOCHS: 25
-  LR_DECAY_R: 0.2
-  PRINT_FREQ: 100
-  LOG_PATH: './logs/refcoco'
-  LOG_IMAGE: False
-  PRETRAIN_WEIGHT: './yolov3_coco.pth'
-  RESUME_PATH: ''
-  SCHEDULER: 'wcosine'
-  MIN_LR: 0.000001
-  WARMUP_LR: 0.0000001
-  WARMUP: 3
-  USE_EMA: True
-  OPT: Adam
-  OPT_PARAMS: {betas: '(0.9, 0.98)', eps: '1e-9'}
-  GRAD_NORM_CLIP: 0.15
-  AMP: False
-  SEED: 123456
+# Training configurations (train_model.py)
+training:
+  learning_rate: 0.001 # Learning rate for optimizer
+  batch_size: 64 # Batch size for data loading
+  num_epochs: 10 # Number of training epochs
+  pre_trained_diffusion_model: "CompVis/stable-diffusion-v1-4" # Pre-trained diffusion model
+  resize_dataloader: 256 # Resize parameter for DataLoader
+  generate_image_model: "path/to/generate/image/model" # Model path for image generation
 
-DISTRIBUTED:
-  # 1 on node 1, 0 on node 0
-  NODE_ID: 0
-  # number of nodes
-  WORLD_SIZE: 1
-  # 'tcp://IP_ADDR_NODE_0:FREEPORT' if multi nodes, 'tcp://127.0.0.1:FREEPORT' if single node
-  DIST_URL: "tcp://127.0.0.1:12345"
-  MULTIPROCESSING_DISTRIBUTED: True
-  RANK: 0
+# Dataset configurations
+dataset:
+  cifar10_path: "/path/to/cifar10/dataset"
+  image_url: "http://path.to.image/url" # If applicable
 
-DATA:
-  DATASET: 'refcoco'
-  MAX_TOKEN: 15
-  INPUT_SHAPE: [416,416]
-  MEAN: [0.485, 0.456, 0.406]
-  STD: [0.229, 0.224, 0.225]
+# Model saving configurations
+model_checkpoint:
+  path: "/path/to/save/model/checkpoints"
+  filename: "model_checkpoints.pth"
 
-  ANN_PATH: {
-  'refcoco':'./data/anns/refcoco.json',
-  'refcoco+': './data/anns/refcoco+.json',
-  'refcocog': './data/anns/refcocog.json',
-  'referit': './data/anns/refclef.json',
-  }
-
-  IMAGE_PATH: {
-  'refcoco': './data/images/train2014',
-  'refcoco+': './data/images/train2014',
-  'refcocog': './data/images/train2014',
-  'referit': './data/images/refclef',
-  }
+# Logging and Visualization
+logging:
+  log_dir: "/path/to/log/directory"
