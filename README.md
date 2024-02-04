@@ -34,16 +34,19 @@ The directory structure of the project looks like this:
 ## Installation 
 Instructions on how to clone and set up your repository:
 
-* Clone this repo :
+### Clone this repo :
+
+Clone the repository and navigate to the project directory:
+
 ```bash
 git clone https://github.com/Yaxin9Luo/my_dediffusion.git
 cd my_dediffusion
 
-* Create a conda virtual environment and activate it:
-```bash
+"Create a conda virtual environment and activate it:"
+
 conda create -n dediffusion python=3.11 -y
 conda activate dediffusion
 
-* Install the required dependencies:
-```bash
+"Install the required dependencies:"
+
 pip install -r requirements.txt
