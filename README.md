@@ -67,7 +67,7 @@ python inference.py --config ./configs/main.yaml
 ### Examples
 I have not yet finetune the model with a lot of data, so the result is not that astonishing. 
 
-Original Image : 
+Original Images : 
 
 ![Original Image](assets/original_image.jpg) 
 
@@ -75,7 +75,7 @@ Original Image :
 
 ![Original Image3](assets/original_image3.jpg) 
 
-Inference Image:
+Inference Images:
 
 
 Encoder Text: there are two cats that are laying on a couch with remotes on the back of the couch
