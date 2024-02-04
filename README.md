@@ -65,7 +65,7 @@ Here I used pretrained BLip and Stable diffusion, you can change to whatever you
 python inference.py --config ./configs/main.yaml
 ```
 ### Examples
-I have not yet finetune the model with a lot of data, so the result is not that astonishing. 
+I have not yet finetuned the model with a lot of data, so the results are not that astonishing. 
 
 Original Images : 
 
