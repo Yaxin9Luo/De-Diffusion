@@ -31,3 +31,7 @@ The directory structure of the project looks like this:
 │   ├── utils.py
 └── LICENSE              <- Open-source license if one is chosen
 ```
+## Installation 
+* Clone this repo 
+git clone https://github.com/AnonymousPaperID5299/RefCLIP.git
+cd RefCLIP

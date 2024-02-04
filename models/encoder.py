@@ -4,19 +4,19 @@ from transformers import ViTImageProcessor, ViTModel,CLIPModel,CLIPTokenizer,Ber
 import torch.nn.functional as F
 
 class MyModel(nn.Module):
-    def __init__(self, cfg):
+    def __init__(self, __C):
         super(MyModel, self).__init__()
-        self.tau = cfg['tau_initial']
+        self.tau = __C.tau_initial
         # Load the pre-trained ViT model
-        self.processor = ViTImageProcessor.from_pretrained(cfg['vit'])
+        self.processor = ViTImageProcessor.from_pretrained(__C.vit)
 
-        self.vit = ViTModel.from_pretrained(cfg['vit'])
+        self.vit = ViTModel.from_pretrained(__C.vit)
         # Initialize the attention pooler
         self.attention_pooler = AttentionPooler()
         
         # Load CLIP model for tokenizing text
-        self.clip_model = CLIPModel.from_pretrained(cfg['clip_model_name'])
-        self.clip_tokenizer = CLIPTokenizer.from_pretrained(cfg['clip_model_name'])
+        self.clip_model = CLIPModel.from_pretrained(__C.clip_model_name)
+        self.clip_tokenizer = CLIPTokenizer.from_pretrained(__C.clip_model_name)
 
         # Linear layer for projecting queries to text tokens
         self.linear_proj = nn.Linear(768, self.clip_tokenizer.vocab_size)
@@ -24,9 +24,8 @@ class MyModel(nn.Module):
         self.sos_token_id = self.clip_tokenizer.bos_token_id  # Start of Sequence Token ID
         self.eos_token_id = self.clip_tokenizer.eos_token_id  # End of Sequence Token
         # Assuming the maximum sequence length (including [SOS] and [EOS]) is 77
-        self.max_length = cfg['max_length']
-        self.hard = cfg['hard']
-        self.dim = cfg['dim']   
+        self.max_length = __C.max_length
+        self.hard = __C.hard
 
     def forward(self, images):
         # Pass images through ViT
@@ -39,9 +38,9 @@ class MyModel(nn.Module):
 
         # Project to text tokens
         text_tokens = self.linear_proj(pooled_outputs) # [75,1,49408]
-        probabilities = F.gumbel_softmax(text_tokens, tau=self.tau, hard=self.hard, dim=self.dim)
+        probabilities = F.gumbel_softmax(text_tokens, tau=self.tau, hard=self.hard, dim=-1)
         # Decode text tokens to text
-        predicted_token_ids = torch.argmax(probabilities, dim= self.dim)
+        predicted_token_ids = torch.argmax(probabilities, dim=-1)
         # Additional logic to handle [SOS], [EOS], and positional encodings
         # Add [SOS] token at the beginning and [EOS] at the end
         batch_size = text_tokens.size(0)

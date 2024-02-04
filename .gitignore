@@ -2,7 +2,7 @@ docs/site/
 data/
 # test cache
 manual_test/
-
+datasets/
 # other local dev info
 .vscode/
 
