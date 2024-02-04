@@ -56,7 +56,7 @@ pip install -r requirements.txt
 ## Training 
 If you wish to train the Attention Pooler inside the image to text encoder block which is mentioned in the paper, you can use the following instruction and modify the config file for your own need. (note: I trained 100 images on a A100 for around 2 hours)
 ```bash
-python train.py train.py --config ./configs/main.yaml
+python train.py --config ./configs/main.yaml
 ```
 ## Inference with pretrained models
 Here I used pretrained BLip and Stable diffusion, you can change to whatever you like, for example, in the offcial paper, the authors mentioned that they use VIT-L and Imagen. 
