@@ -70,9 +70,9 @@ def train(model,__C):
         transforms.Resize((__C.training.resize_dataloader,__C.training.resize_dataloader)),
         transforms.ToTensor(),
     ])
-    train_dataset = datasets.CIFAR10(root='/root/autodl-tmp/my_dediffusion/datasets', train=True, download=True, transform=transform)
+    train_dataset = datasets.CIFAR10(__C.dataset.cifar10_path, train=True, download=True, transform=transform)
     # Load the dataset
-    indices = list(range(10))  # indices for the first 10 samples
+    indices = list(range(__C.training.num_images))  # indices for the first 10 samples
     subset_train_dataset = Subset(train_dataset, indices)
     train_loader = DataLoader(subset_train_dataset, batch_size=__C.training.batch_size, shuffle=True) # for 100 images
 

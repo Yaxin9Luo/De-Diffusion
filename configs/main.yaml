@@ -11,21 +11,22 @@ model:
 training:
   learning_rate: 0.001 # Learning rate for optimizer
   batch_size: 1 # Batch size for data loading
-  num_epochs: 1 # Number of training epochs
+  num_epochs: 10 # Number of training epochs
   pre_trained_diffusion_model: "CompVis/stable-diffusion-v1-4" # Pre-trained diffusion model
   resize_dataloader: 256 # Resize parameter for DataLoader
+  num_images: 100 # Number of images to train on
 # BLIP Model and Processor configurations
 inference:
   pretrained_blip_model: "Salesforce/blip-image-captioning-large" # Pre-trained BLIP model
   max_length: 50
   min_length: 20
   num_beams: 5
-  output_path: "/root/autodl-tmp/my_dediffusion/outputs/figures/inference_image.jpg" # path for image generation
+  output_path: "outputs/figures/inference_image.jpg" # path for image generation
   img_url: "http://images.cocodataset.org/val2017/000000039769.jpg" # URL of the original image you wish to use
 # Dataset configurations
 dataset:
-  cifar10_path: "/path/to/cifar10/dataset"
+  cifar10_path: "datasets"
 # Model saving configurations
 model_checkpoint:
-  path: "/root/autodl-tmp/my_dediffusion/logs"
+  path: "logs"
   filename: "model_checkpoints.pth"
