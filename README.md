@@ -41,12 +41,29 @@ Clone the repository and navigate to the project directory:
 ```bash
 git clone https://github.com/Yaxin9Luo/my_dediffusion.git
 cd my_dediffusion
+```
 
-"Create a conda virtual environment and activate it:"
-
+### Create a conda virtual environment and activate it:
+```bash
 conda create -n dediffusion python=3.11 -y
 conda activate dediffusion
-
-"Install the required dependencies:"
-
+```
+### Install the required dependencies:
+```bash
 pip install -r requirements.txt
+```
+## Training 
+If you wish to train the Attention Pooler inside the image to text encoder block which is mentioned in the paper, you can use the following instruction and modify the config file for your own need. (note: I trained 100 images on a A100 for around 2 hours)
+```bash
+python train.py train.py --config ./configs/main.yaml
+```
+## Inference with pretrained models
+Here I used pretrained BLip and Stable diffusion, you can change to whatever you like, for example, in the offcial paper, the authors mentioned that they use CoCa VIT-L and Imagen.
+
+```bash 
+python inference.py --config ./configs/main.yaml
+```
+## One Example
+Original Image : 
+In the `![Inference Results](assets/inference_image.jpg)` 
+
