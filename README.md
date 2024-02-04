@@ -17,7 +17,7 @@ The directory structure of the project looks like this:
 ├── models  <- Source code for use in this project.
 │   ├── __init__.py
 │   ├── decoder.py
-│  ├── encoder.py
+│   ├── encoder.py
 │   │
 │── train_model.py   <- script for training the model
 │── predict_model.py <- script for predicting from a model
@@ -29,6 +29,7 @@ The directory structure of the project looks like this:
 │   ├── distributed.py
 │   ├── logging.py
 │   ├── utils.py
+├── assets               <- for github repo 
 └── LICENSE              <- Open-source license if one is chosen
 ```
 ## Installation 
