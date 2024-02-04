@@ -64,16 +64,31 @@ Here I used pretrained BLip and Stable diffusion, you can change to whatever you
 ```bash 
 python inference.py --config ./configs/main.yaml
 ```
-### One Example
+### Examples
 I have not yet finetune the model with a lot of data, so the result is not that astonishing. 
 
 Original Image : 
 
 ![Original Image](assets/original_image.jpg) 
 
+![Original Image2](assets/original_image2.jpg) 
+
+![Original Image3](assets/original_image3.jpg) 
+
 Inference Image:
 
+
+Text: there are two cats that are laying on a couch with remotes on the back of the couch
+
 ![Inference Results](assets/inference_image.jpg)
+
+Text: there is a dog that is running with a frisbee in it's mouth in the grass
+
+![Inference Results2](assets/inference_image2.jpg)
+
+Text: there is a dog that is running in the snow with a frisbee in it's mouth
+
+![Inference Results3](assets/inference_image3.jpg)
 
 ## Citation
 ```bash 

@@ -22,7 +22,7 @@ inference:
   min_length: 20
   num_beams: 5
   output_path: "outputs/figures/inference_image.jpg" # path for image generation
-  img_url: "http://images.cocodataset.org/val2017/000000039769.jpg" # URL of the original image you wish to use
+  img_path: "https://farm1.staticflickr.com/123/411486338_558f63a3eb_z.jpg" # URL or path of the original image you wish to use
 # Dataset configurations
 dataset:
   cifar10_path: "datasets"

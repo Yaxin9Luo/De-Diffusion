@@ -43,7 +43,7 @@ def generate_image(text,__C):
     return image
 def inference(__C):
     # Load the dataset
-    url = __C.inference.img_url
+    url = __C.inference.img_path
     image = Image.open(requests.get(url, stream=True).raw).convert('RGB') # 640x480
     # image_path ="/root/autodl-tmp/MLops_project_Group18/data/raw/111.png"
     # image = Image.open(image_path).convert('RGB')
