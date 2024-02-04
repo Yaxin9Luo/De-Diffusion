@@ -1,6 +1,6 @@
 # my_dediffusion
 
-This is the my unofficial implementaion of the model from paper "De-Diffusion Makes Text a Strong Cross-Modal Interface" by Chen Wei, Chenxi Liu, Siyuan Qiao, Zhishuai Zhang, Alan Yuille and Jiahui Yu
+This is the my unofficial implementaion of the model from paper "De-Diffusion Makes Text a Strong Cross-Modal Interface" by Chen Wei, Chenxi Liu, Siyuan Qiao, Zhishuai Zhang, Alan Yuille and Jiahui Yu. Hope this repo can give a easy to use code framework for anyone like me wishes to reproduce the paper.
 
 ## Project structure
 
@@ -17,7 +17,7 @@ The directory structure of the project looks like this:
 ├── models  <- Source code for use in this project.
 │   ├── __init__.py
 │   ├── decoder.py
-|   ├── encoder.py
+│  ├── encoder.py
 │   │
 │── train_model.py   <- script for training the model
 │── predict_model.py <- script for predicting from a model
@@ -58,12 +58,29 @@ If you wish to train the Attention Pooler inside the image to text encoder block
 python train.py train.py --config ./configs/main.yaml
 ```
 ## Inference with pretrained models
-Here I used pretrained BLip and Stable diffusion, you can change to whatever you like, for example, in the offcial paper, the authors mentioned that they use CoCa VIT-L and Imagen.
+Here I used pretrained BLip and Stable diffusion, you can change to whatever you like, for example, in the offcial paper, the authors mentioned that they use VIT-L and Imagen. 
 
 ```bash 
 python inference.py --config ./configs/main.yaml
 ```
-## One Example
+### One Example
+I have not yet finetune the model with a lot of data, so the result is not that astonishing. 
+
 Original Image : 
-In the `![Inference Results](assets/inference_image.jpg)` 
+
+![Original Image](assets/original_image.jpg) 
+
+Inference Image:
+
+![Inference Results](assets/inference_image.jpg)
+
+## Citation
+```bash 
+@article{wei2023dediffusion,
+  title={De-Diffusion Makes Text a Strong Cross-Modal Interface},
+  author={Wei, Chen and Liu, Chenxi and Qiao, Siyuan and Zhang, Zhishuai and Yuille, Alan and Yu, Jiahui},
+  journal={arXiv preprint arXiv:2311.00618},
+  year={2023},
+  url={https://arxiv.org/abs/2311.00618}
+}
 
