@@ -32,6 +32,18 @@ The directory structure of the project looks like this:
 └── LICENSE              <- Open-source license if one is chosen
 ```
 ## Installation 
-* Clone this repo 
-git clone https://github.com/AnonymousPaperID5299/RefCLIP.git
-cd RefCLIP
+Instructions on how to clone and set up your repository:
+
+* Clone this repo :
+```bash
+git clone https://github.com/Yaxin9Luo/my_dediffusion.git
+cd my_dediffusion
+
+* Create a conda virtual environment and activate it:
+```bash
+conda create -n dediffusion python=3.11 -y
+conda activate dediffusion
+
+* Install the required dependencies:
+```bash
+pip install -r requirements.txt
