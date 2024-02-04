@@ -78,15 +78,15 @@ Original Image :
 Inference Image:
 
 
-Text: there are two cats that are laying on a couch with remotes on the back of the couch
+Encoder Text: there are two cats that are laying on a couch with remotes on the back of the couch
 
 ![Inference Results](assets/inference_image.jpg)
 
-Text: there is a dog that is running with a frisbee in it's mouth in the grass
+Encoder Text: there is a dog that is running with a frisbee in it's mouth in the grass
 
 ![Inference Results2](assets/inference_image2.jpg)
 
-Text: there is a dog that is running in the snow with a frisbee in it's mouth
+Encoder Text: there is a dog that is running in the snow with a frisbee in it's mouth
 
 ![Inference Results3](assets/inference_image3.jpg)
 
